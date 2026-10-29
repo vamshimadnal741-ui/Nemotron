@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nemotron Router | Nebius x NVIDIA Hackathon</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --nvidia-green: #76b900;
+      --tier-small: #10b981;
+      --tier-mid: #3b82f6;
+      --tier-large: #8b5cf6;
+      --hero-saved: #059669;
+      --warning-bg: #fef3c7;
+      --warning-border: #f59e0b;
+      --warning-text: #92400e;
+      --error-bg: #fee2e2;
+      --error-border: #ef4444;
+      --error-text: #b91c1c;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --accent: #3b82f6;
+      --accent-hover: #60a5fa;
+      --nvidia-green: #76b900;
+      --tier-small: #10b981;
+      --tier-mid: #60a5fa;
+      --tier-large: #a78bfa;
+      --hero-saved: #34d399;
+      --warning-bg: #312106;
+      --warning-border: #b45309;
+      --warning-text: #fde68a;
+      --error-bg: #371313;
+      --error-border: #dc2626;
+      --error-text: #fca5a5;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 1.5rem 1rem 3rem 1rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #76b900 0%, #10b981 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 900;
+      font-size: 1.25rem;
+      box-shadow: 0 2px 4px rgba(118, 185, 0, 0.4);
+    }
+
+    .brand-title h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    .brand-title p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    button.btn-icon {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 0.5rem 0.85rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    button.btn-icon:hover {
+      border-color: var(--accent);
+    }
+
+    /* Banners */
+    .banner {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.25rem;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .banner-warning {
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      color: var(--warning-text);
+    }
+    .banner-error {
+      background: var(--error-bg);
+      border: 1px solid var(--error-border);
+      color: var(--error-text);
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card.hero-card {
+      grid-column: span 2;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.05) 100%);
+      border-color: var(--nvidia-green);
+    }
+
+    @media (max-width: 768px) {
+      .kpi-card.hero-card {
+        grid-column: span 1;
+      }
+    }
+
+    .kpi-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .kpi-value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .kpi-value.hero-number {
+      font-size: 2.75rem;
+      color: var(--hero-saved);
+      display: flex;
+      align-items: baseline;
+      gap: 0.25rem;
+    }
+
+    .kpi-subtext {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Tier Model Info Bar */
+    .tier-bar-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .tier-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .tier-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .badge-small {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--tier-small);
+      border: 1px solid var(--tier-small);
+    }
+    .badge-mid {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--tier-mid);
+      border: 1px solid var(--tier-mid);
+    }
+    .badge-large {
+      background: rgba(139, 92, 246, 0.15);
+      color: var(--tier-large);
+      border: 1px solid var(--tier-large);
+    }
+
+    /* Main Console */
+    .console-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .console-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .console-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .quick-examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn-example {
+      background: var(--bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .btn-example:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    textarea.prompt-input {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: vertical;
+      margin-bottom: 0.75rem;
+    }
+    textarea.prompt-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    .console-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-submit {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.65rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: var(--accent-hover);
+    }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Result Display */
+    .result-container {
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--card-border);
+      display: none;
+    }
+
+    .result-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .result-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .answer-box {
+      background: var(--bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: inherit;
+      max-height: 450px;
+      overflow-y: auto;
+    }
+
+    /* Table Section */
+    .table-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      overflow-x: auto;
+    }
+
+    .table-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+
+    th {
+      background: var(--bg);
+      color: var(--text-muted);
+      padding: 0.65rem 0.75rem;
+      font-weight: 600;
+      border-bottom: 2px solid var(--card-border);
+    }
+
+    td {
+      padding: 0.65rem 0.75rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    tr:hover td {
+      background: rgba(37, 99, 235, 0.03);
+    }
+
+    .prompt-cell {
+      max-width: 250px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-logo">N</div>
+        <div class="brand-title">
+          <h1>Nemotron Router</h1>
+          <p>Nebius x NVIDIA Global AI Hackathon • Cost-Optimized Dynamic LLM Dispatcher</p>
+        </div>
+      </div>
+      <div class="header-controls">
+        <button class="btn-icon" id="theme-btn" onclick="toggleTheme()">☀️ Light</button>
+        <button class="btn-icon" onclick="fetchStats()">🔄 Refresh</button>
+      </div>
+    </header>
+
+    <!-- Error / Warning Banners -->
+    <div id="error-banner" class="banner banner-error" style="display: none;"></div>
+    <div id="warning-banner" class="banner banner-warning" style="display: none;">
+      ⚠️ <strong>Notice:</strong> Pricing values in <code>.env</code> are placeholders. Update <code>PRICE_SMALL</code>, <code>PRICE_MID</code>, and <code>PRICE_LARGE</code> with official Nebius rates for exact figures.
+    </div>
+
+    <!-- Hero KPI Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card hero-card">
+        <div class="kpi-label">
+          <span>Total Cost Saved</span>
+          <span>vs Always Large Model</span>
+        </div>
+        <div class="kpi-value hero-number" id="kpi-saved-pct">
+          0.0<span style="font-size: 1.5rem;">%</span>
+        </div>
+        <div class="kpi-subtext" id="kpi-saved-dollars">
+          $0.000000 saved across 0 queries
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Requests Routed</div>
+        <div class="kpi-value" id="kpi-requests">0</div>
+        <div class="kpi-subtext" id="kpi-tier-counts">S: 0 | M: 0 | L: 0</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Routed Cost</div>
+        <div class="kpi-value" id="kpi-routed-cost">$0.000000</div>
+        <div class="kpi-subtext">Actual Token Cost (Inc. Classifier)</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Large-Only Baseline</div>
+        <div class="kpi-value" id="kpi-baseline-cost">$0.000000</div>
+        <div class="kpi-subtext">Cost if sent to 340B/Large</div>
+      </div>
+    </div>
+
+    <!-- Active Tier Models Bar -->
+    <div class="tier-bar-card">
+      <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">ACTIVE DISCOVERED TIERS & MODELS:</div>
+      <div class="tier-pills">
+        <span class="tier-badge badge-small" id="badge-model-small">Tier 1-2 (Small): loading...</span>
+        <span class="tier-badge badge-mid" id="badge-model-mid">Tier 3 (Mid): loading...</span>
+        <span class="tier-badge badge-large" id="badge-model-large">Tier 4-5 (Large): loading...</span>
+      </div>
+    </div>
+
+    <!-- Prompt Console -->
+    <div class="console-card">
+      <div class="console-header">
+        <div class="console-title">Interactive Router Console</div>
+      </div>
+      
+      <div class="quick-examples">
+        <span style="font-size: 0.8rem; color: var(--text-muted); align-self: center;">Try sample:</span>
+        <button class="btn-example" onclick="setPrompt('easy')">🟢 Easy: What is the capital of France and its primary language?</button>
+        <button class="btn-example" onclick="setPrompt('mid')">🟡 Mid: Compare SQL vs NoSQL database performance for IoT time-series data.</button>
+        <button class="btn-example" onclick="setPrompt('hard')">🟣 Hard: Write a complete Python implementation of dynamic programming Traveling Salesperson with bitmasking and explain O(n^2 2^n).</button>
+      </div>
+
+      <textarea id="prompt-input" class="prompt-input" placeholder="Type your prompt here... The classifier will rate its difficulty and route to the most cost-effective Nemotron model."></textarea>
+      
+      <div class="console-actions">
+        <button id="submit-btn" class="btn-submit" onclick="submitPrompt()">
+          <span>Route & Execute</span>
+        </button>
+      </div>
+
+      <!-- Execution Result -->
+      <div id="result-box" class="result-container">
+        <div class="result-header">
+          <div class="result-badges">
+            <span id="res-tier-badge" class="tier-badge badge-small">Small Tier</span>
+            <span id="res-diff-badge" class="tier-badge" style="background: rgba(148, 163, 184, 0.2);">Difficulty: 1/5</span>
+            <span id="res-model-badge" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Model</span>
+            <span id="res-retry-badge" class="tier-badge badge-mid" style="display: none;">Retried</span>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted);" id="res-metrics">
+            Latency: 0.00s | Cost: $0.000000 | Saved: 0%
+          </div>
+        </div>
+        <div id="answer-content" class="answer-box"></div>
+      </div>
+    </div>
+
+    <!-- Recent History Table -->
+    <div class="table-card">
+      <div class="table-title">Recent Routed Requests (Last 20)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Time</th>
+            <th>Prompt</th>
+            <th>Difficulty</th>
+            <th>Routed Tier</th>
+            <th>Model</th>
+            <th>Cost</th>
+            <th>Baseline</th>
+            <th>Saved %</th>
+            <th>Latency</th>
+          </tr>
+        </thead>
+        <tbody id="history-tbody">
+          <tr>
+            <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 2rem;">No requests routed yet. Try sending a prompt above!</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const EXAMPLES = {
+      easy: "What is the capital of France and what language is spoken there?",
+      mid: "Compare and contrast SQL and NoSQL databases for high-throughput IoT time-series analytics, focusing on read/write latency and schema flexibility.",
+      hard: "Write a complete Python implementation of the Traveling Salesperson Problem using dynamic programming with bitmasking (Held-Karp algorithm). Include comments explaining the bitmask transitions and analyze the time and space complexity."
+    };
+
+    function setPrompt(type) {
+      document.getElementById('prompt-input').value = EXAMPLES[type] || '';
+    }
+
+    function toggleTheme() {
+      const current = document.body.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', next);
+      localStorage.setItem('nemotron_theme', next);
+      document.getElementById('theme-btn').textContent = next === 'dark' ? '☀️ Light' : '🌙 Dark';
+    }
+
+    // Init theme
+    const savedTheme = localStorage.getItem('nemotron_theme') || 'dark';
+    document.body.setAttribute('data-theme', savedTheme);
+    document.getElementById('theme-btn').textContent = savedTheme === 'dark' ? '☀️ Light' : '🌙 Dark';
+
+    async function checkHealth() {
+      try {
+        const res = await fetch('/api/health');
+        const data = await res.json();
+        
+        const errorBanner = document.getElementById('error-banner');
+        if (!data.has_api_key) {
+          errorBanner.innerHTML = '⚠️ <strong>Setup Required:</strong> <code>NEBIUS_API_KEY</code> is missing in <code>.env</code>. Configure your key from Nebius Token Factory.';
+          errorBanner.style.display = 'block';
+        } else if (data.discovery_error) {
+          errorBanner.innerHTML = `⚠️ <strong>Model Warning:</strong> ${data.discovery_error}`;
+          errorBanner.style.display = 'block';
+        } else {
+          errorBanner.style.display = 'none';
+        }
+
+        const warningBanner = document.getElementById('warning-banner');
+        if (data.is_placeholder_pricing) {
+          warningBanner.style.display = 'block';
+        } else {
+          warningBanner.style.display = 'none';
+        }
+
+        if (data.selected_models) {
+          document.getElementById('badge-model-small').textContent = `Small: ${data.selected_models.small}`;
+          document.getElementById('badge-model-mid').textContent = `Mid: ${data.selected_models.mid}`;
+          document.getElementById('badge-model-large').textContent = `Large: ${data.selected_models.large}`;
+        }
+      } catch (err) {
+        console.error('Health check failed', err);
+      }
+    }
+
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+
+        // Update KPIs
+        document.getElementById('kpi-saved-pct').innerHTML = `${data.savings_percent.toFixed(1)}<span style="font-size: 1.5rem;">%</span>`;
+        document.getElementById('kpi-saved-dollars').textContent = `$${data.total_saved.toFixed(6)} saved across ${data.total_requests} queries`;
+        document.getElementById('kpi-requests').textContent = data.total_requests;
+        
+        const tiers = data.per_tier_counts || {};
+        document.getElementById('kpi-tier-counts').textContent = `S: ${tiers.small || 0} | M: ${tiers.mid || 0} | L: ${tiers.large || 0}`;
+        document.getElementById('kpi-routed-cost').textContent = `$${data.total_cost.toFixed(6)}`;
+        document.getElementById('kpi-baseline-cost').textContent = `$${data.total_baseline.toFixed(6)}`;
+
+        // Update Table
+        const tbody = document.getElementById('history-tbody');
+        if (data.recent_requests && data.recent_requests.length > 0) {
+          tbody.innerHTML = data.recent_requests.map(req => {
+            let tierClass = 'badge-small';
+            if (req.tier === 'mid') tierClass = 'badge-mid';
+            if (req.tier === 'large') tierClass = 'badge-large';
+
+            return `
+              <tr>
+                <td>${req.id}</td>
+                <td>${req.timestamp}</td>
+                <td class="prompt-cell" title="${req.prompt_preview.replace(/"/g, '&quot;')}">${req.prompt_preview}</td>
+                <td><span class="tier-badge" style="background: rgba(148, 163, 184, 0.2);">${req.difficulty}/5</span></td>
+                <td><span class="tier-badge ${tierClass}">${req.tier.toUpperCase()}</span></td>
+                <td><code>${req.model}</code></td>
+                <td>$${req.cost.toFixed(6)}</td>
+                <td>$${req.baseline.toFixed(6)}</td>
+                <td style="color: var(--hero-saved); font-weight: 700;">+${req.saved_percent.toFixed(1)}%</td>
+                <td>${req.latency.toFixed(2)}s</td>
+              </tr>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error('Failed to fetch stats', err);
+      }
+    }
+
+    async function submitPrompt() {
+      const input = document.getElementById('prompt-input');
+      const prompt = input.value.trim();
+      if (!prompt) return;
+
+      const btn = document.getElementById('submit-btn');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner"></span> Routing...`;
+
+      const resultBox = document.getElementById('result-box');
+      const answerBox = document.getElementById('answer-content');
+
+      try {
+        const res = await fetch('/api/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || `Server error: ${res.status}`);
+        }
+
+        const data = await res.json();
+        
+        // Show result box
+        resultBox.style.display = 'block';
+        answerBox.textContent = data.answer;
+
+        // Badges
+        const tierBadge = document.getElementById('res-tier-badge');
+        tierBadge.className = `tier-badge badge-${data.tier}`;
+        tierBadge.textContent = `Tier: ${data.tier.toUpperCase()}`;
+
+        document.getElementById('res-diff-badge').textContent = `Difficulty: ${data.difficulty}/5`;
+        document.getElementById('res-model-badge').textContent = data.model;
+
+        const retryBadge = document.getElementById('res-retry-badge');
+        retryBadge.style.display = data.retried ? 'inline-flex' : 'none';
+
+        document.getElementById('res-metrics').textContent = 
+          `Latency: ${data.latency.toFixed(2)}s | Routed Cost: $${data.cost.toFixed(6)} | Baseline: $${data.baseline.toFixed(6)} | Saved: ${data.saved_percent.toFixed(1)}%`;
+
+        // Refresh stats
+        await fetchStats();
+      } catch (err) {
+        resultBox.style.display = 'block';
+        answerBox.textContent = `Error: ${err.message}`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    // Auto load on start
+    checkHealth();
+    fetchStats();
+    setInterval(fetchStats, 10000);
+  </script>
+</body>
+</html>
